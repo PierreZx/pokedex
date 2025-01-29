@@ -54,19 +54,35 @@ class _PokedexScreenState extends State<PokedexScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Pokédex')),
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        
+        title:Center(
+        child: Text('PEDEX'),
+        )
+        ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            TextField(
-              controller: searchController,
-              decoration: InputDecoration(
-                labelText: 'Digite o nome do Pokémon',
-                border: OutlineInputBorder(),
+              TextField(
+                controller: searchController,
+                style: TextStyle(color: Colors.white), // Cor do texto digitado
+                decoration: InputDecoration(
+                  labelText: 'Digite o nome do Pokémon',
+                  labelStyle: TextStyle(color: Colors.white), // Cor do texto do label
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white), // Cor da borda
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey), // Cor da borda quando não está em foco
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white), // Cor da borda quando em foco
+                  ),
+                ),
               ),
-            ),
             SizedBox(height: 10),
             ElevatedButton(
               onPressed: () {
@@ -92,19 +108,57 @@ class _PokedexScreenState extends State<PokedexScreen> {
                         },
                         child: Column(
                           children: [
-                            Text(
-                              pokemon!.name.toUpperCase(),
-                              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                border: Border.all(
+                                  color: Colors.black,
+                                  width: 2.0,
+                                ),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              padding: EdgeInsets.all(10.0),
+                              child: Column(
+                                children: [
+                                  Text(
+                                    pokemon!.name.toUpperCase(),
+                                    style: TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  SizedBox(height: 0),
+                                  Image.network(
+                                    pokemon!.imageUrl,
+                                    width: 150,
+                                    height: 150,
+                                  ),
+                                  SizedBox(height: 16),
+                                  Text(
+                                    "ID: ${pokemon!.id}",
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.grey[700],
+                                    ),
+                                  ),
+                                  SizedBox(height: 16),
+                                  Text(
+                                    "Tipos: ${pokemon!.types.join(', ')}",
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.green,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                            Image.network(pokemon!.imageUrl),
-                            Text("ID: ${pokemon!.id}"),
-                            Text("Tipos: ${pokemon!.types.join(', ')}"),
                           ],
                         ),
                       ),
-          ],
-        ),
-      ),
+                    ],
+                  ),
+          ),
     );
   }
 }
@@ -153,13 +207,25 @@ class PokemonDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(pokemon.name)),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+  return Scaffold(
+    backgroundColor: Colors.black,
+    appBar: AppBar(title: Text(pokemon.name)),
+    body: Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Center( // Centraliza verticalmente
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center, // Centraliza horizontalmente
           children: [
+            Image.network(pokemon.imageUrl),
+            Container(
+            decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(
+            color: Colors.black,
+            width: 2.0,
+            ),
+            borderRadius: BorderRadius.circular(12),
+            ),
             Image.network(pokemon.imageUrl),
             Text(
               pokemon.name.toUpperCase(),
@@ -172,9 +238,11 @@ class PokemonDetailScreen extends StatelessWidget {
             Text("Força (Ataque): ${pokemon.attack}"),
             Text("Altura: ${pokemon.height / 10} m"),
             Text("Peso: ${pokemon.weight / 10} kg"),
-          ],
+            )
+            ],
+          ),
         ),
       ),
     );
-  }
+}
 }
