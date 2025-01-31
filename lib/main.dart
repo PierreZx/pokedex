@@ -46,6 +46,7 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
 class PokedexScreen extends StatefulWidget {
   @override
   _PokedexScreenState createState() => _PokedexScreenState();
@@ -104,22 +105,18 @@ class _PokedexScreenState extends State<PokedexScreen> {
           children: [
             TextField(
               controller: searchController,
-              style: TextStyle(color: Colors.white), // Cor do texto digitado
+              style: TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 labelText: 'Digite o nome do Pokémon ou id',
-                labelStyle:
-                    TextStyle(color: Colors.white), // Cor do texto do label
+                labelStyle: TextStyle(color: Colors.white),
                 border: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white), // Cor da borda
+                  borderSide: BorderSide(color: Colors.white),
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                      color:
-                          Colors.grey), // Cor da borda quando não está em foco
+                  borderSide: BorderSide(color: Colors.grey),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                      color: Colors.white), // Cor da borda quando em foco
+                  borderSide: BorderSide(color: Colors.white),
                 ),
               ),
             ),
@@ -127,11 +124,24 @@ class _PokedexScreenState extends State<PokedexScreen> {
             ElevatedButton(
               onPressed: () {
                 if (searchController.text.isNotEmpty) {
-                  fetchPokemon(
-                      context, searchController.text); // Passando context
+                  fetchPokemon(context, searchController.text);
                 }
               },
               child: Text('Buscar'),
+            ),
+            ElevatedButton.icon(
+              onPressed: () async {
+                print('potão precionado!');
+              },
+              icon: Icon(Icons.catching_pokemon_outlined,
+                  size: 30, color: Colors.white),
+              label: Text(""),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue, // Cor de fundo
+                foregroundColor: Colors.white, // Cor do texto
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                textStyle: TextStyle(fontSize: 18),
+              ),
             ),
             SizedBox(height: 20),
             isLoading
@@ -276,16 +286,57 @@ class PokemonDetailScreen extends StatelessWidget {
   Future<void> savePokemon(BuildContext context, Pokemon pokemon) async {
     final db = await initDatabase();
 
+    final count = await db.rawQuery('SELECT COUNT(*) FROM pokemon');
+    final currentCount = count.first.values.first as int;
+
+    if (currentCount >= 6) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Limite máximo de 6 pokémons atingido!'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    // Salvar pokémon
     await db.insert(
       'pokemon',
       pokemon.toMap(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
 
+    // Mostrar sucesso
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('${pokemon.name} foi salvo com sucesso!')),
     );
+
+    // Imprimir todos os pokémons no console
+    final List<Map<String, dynamic>> allPokemons = await db.query('pokemon');
+    print('POKÉMONS SALVOS');
+    for (var p in allPokemons) {
+      print('ID: ${p['id']}');
+      print('Nome: ${p['name']}');
+      print('Imagem: ${p['imageUrl']}');
+      print('Tipos: ${p['types']}');
+      print('HP: ${p['hp']}');
+      print('Ataque: ${p['attack']}');
+      print('Altura: ${p['height']}');
+      print('Peso: ${p['weight']}');
+    }
   }
+
+  Future<void> deleteDatabase() async {
+  final dbPath = await getDatabasesPath();
+  final dbFile = join(dbPath, 'pokemon_database.db');
+  
+  try {
+    await databaseFactory.deleteDatabase(dbFile);
+    print('Banco de dados apagado com sucesso!');
+  } catch (e) {
+    print('Erro ao apagar o banco de dados: $e');
+  }
+}
 
   @override
   Widget build(BuildContext context) {
