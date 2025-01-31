@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 Future<Database> initDatabase() async {
   return openDatabase(
@@ -26,15 +26,18 @@ Future<Database> initDatabase() async {
 }
 
 void main() async {
-  // Inicialize o databaseFactoryFfiWeb para uso na web
-  databaseFactory = databaseFactoryFfiWeb;
-  
   WidgetsFlutterBinding.ensureInitialized();
-  await initDatabase();
-  runApp(MyApp());
+
+  // Inicializa o suporte ao SQLite no desktop
+  sqfliteFfiInit();
+  databaseFactory = databaseFactoryFfi;
+
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -43,7 +46,6 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
 class PokedexScreen extends StatefulWidget {
   @override
   _PokedexScreenState createState() => _PokedexScreenState();
